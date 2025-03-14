@@ -1,60 +1,63 @@
-from flask import Flask, request, jsonify
-from PIL import Image, ImageEnhance
-import base64
-from flask_cors import CORS
-import pytesseract
-from io import BytesIO
 import cv2
-import numpy as np
+import pytesseract
 import re
 
-image = Image.open("./src/caca_palavras2.jpg")
+image = cv2.imread("./src/caca_palavras2.jpg")
 
-image = ImageEnhance.Contrast(image)
-image = image.enhance(2)
+image = cv2.bitwise_not(image,cv2.COLOR_BAYER_BG2BGR)
+#image = cv2.convertScaleAbs(image, contrast, brightness)
+#image = cv2.bilateralFilter(image,9,75,75)
 
-image_dimensions = [image.getbbox()[2], image.getbbox()[3]]
-dimensao_caca_palavra = [7, 7]
+lines = 7
+columns = 7
 
-arrData = []
+x_axis = image.shape[0]
+y_axis = image.shape[1]
 
-#image.show()
-
-size_h = image_dimensions[1]/dimensao_caca_palavra[1]
-size_w = image_dimensions[0]/dimensao_caca_palavra[0]
+height = (y_axis/lines).__round__()
+width = (x_axis/columns).__round__()
 
 top = 0
-bottom = size_h
+bottom = height.__round__()
 
-for x in range(2):#dimensao_caca_palavra[1]):
+data = [[],[]]
+
+cv2.imshow("caca_palavras", image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+
+
+for x in range(lines):
 
     left = 0
-    right = size_w
+    right = width.__round__()
     
-    line = []
-    for y in range(dimensao_caca_palavra[0]):
-        
-        cropped_image = image.crop((left, top, right, bottom))
+    letters = []
     
-        #configuração do pytesseract e transformando em string
-        customConfig = '--oem 3 --psm 6'
-        letra = pytesseract.image_to_string(cropped_image, config=customConfig)
-        
-        letra = re.sub(r'[^a-zA-Z\s]', '', letra)
-        letra = letra.replace("\n", "")
-        
-        line.append(letra)
-        
-        left = left + size_w
-        right = right + size_w
+    #image = cv2.bitwise_not(image,cv2.COLOR_BAYER_BG2BGR)
+    cropped_image = image[top:bottom, left:x_axis]
+    
+    contrast = 5
+    brightness = 5
+    
+    cropped_image = cv2.convertScaleAbs(cropped_image, contrast, brightness)
+    cropped_image = cv2.bilateralFilter(cropped_image,9,75,75)
 
-    
-    line = "".join(line)
-    arrData.append(line)
-    print(line)
-    line = ""
-    top = top + size_h
-    bottom = bottom + size_h
 
-print(arrData)
-image.show()
+
+    customConfig = '--oem 3 --psm 6'
+    data_line = pytesseract.image_to_string(cropped_image, config=customConfig)
+    data_line = re.sub(r'[^A-Z]', '', data_line)
+    data_line = data_line.replace("\n", "")
+    
+    data[0].append(data_line)
+    data_line = ""
+    cv2.imshow("line" + str(x), cropped_image)
+    cv2.waitKey(0)
+        
+    bottom = bottom + height
+    top = top + height
+    #data[0].append("".join(letters))
+    
+print(data)
