@@ -5,6 +5,7 @@ import re
 image = cv2.imread("./src/caca_palavras2.jpg")
 
 image = cv2.bitwise_not(image,cv2.COLOR_BAYER_BG2BGR)
+#image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 #image = cv2.convertScaleAbs(image, contrast, brightness)
 #image = cv2.bilateralFilter(image,9,75,75)
 
@@ -35,15 +36,13 @@ for x in range(lines):
     
     letters = []
     
-    #image = cv2.bitwise_not(image,cv2.COLOR_BAYER_BG2BGR)
     cropped_image = image[top:bottom, left:x_axis]
     
-    contrast = 5
+    contrast = 0
     brightness = 5
     
     cropped_image = cv2.convertScaleAbs(cropped_image, contrast, brightness)
     cropped_image = cv2.bilateralFilter(cropped_image,9,75,75)
-
 
 
     customConfig = '--oem 3 --psm 6'
