@@ -7,8 +7,6 @@ def cut(image, lines, columns):
     x_axis = image.shape[0]
     y_axis = image.shape[1]
     height = (y_axis/lines).__round__()
-
-
     width = (x_axis/columns).__round__()
 
     top = 0
