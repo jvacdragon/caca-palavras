@@ -13,3 +13,4 @@ def cut(image, lines, columns):
     bottom = height.__round__()
     
     return(gray, top, bottom, x_axis, width, height)
+
